@@ -1,0 +1,42 @@
+{% extends "draft/base.html" %}
+{% load crispy_forms_tags %}
+{% block content%}
+    <div class="col-md-8">
+        <div class="content-section">
+            <div class="media">
+            <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+            <div class="media-body">
+                <h2 class="account-heading">{{ user.username }}</h2>
+                <p class="text-secondary">{{ user.email }}</p>
+            </div>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">Profile Info</legend>
+                    {{ u_form|crispy }}
+                    {{ p_form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-outline-info" type="submit">Update</button>
+                </div>
+            </form>
+        </div>
+        <!--User profile page-->
+        <div class="content-section">
+            <p class="border-bottom mb-4">My Leagues</p>
+            {% for league in user.league_set.all%}
+                <li class="list-group-item list-group-item-light"><a href="/draft/{{league.leagueId}}/">League ID: {{league.leagueId}}</a>
+                <form type="POST" class="float-right">
+                    {%csrf_token%}
+                    <input type="hidden" name="back" value="{{ request.path }}">
+                    <button class="btn btn-outline-danger" type="submit" formaction="/delete/{{league.leagueId}}/confirm">Delete League</button>
+                </form><br>
+                <small class="muted-text ">Teams: {{league.teams}}, Rounds: {{league.rounds}}, Season: {{league.year}}</small><br>
+                <small class="muted-text ">Date Created: {{league.date_created|date:"F d, Y, g:iA T"}}</small>
+                </li> 
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock content %}
